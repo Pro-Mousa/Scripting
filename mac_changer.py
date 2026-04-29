@@ -1,20 +1,31 @@
 import subprocess
 import optparse
 
-parse_object = optparse.OptionParser()
-parse_object.add_option("-i","--interface",dest="wifi_interface",help="wifi interface to change!")
-parse_object.add_option("-m", "--mac",dest="mac_address",help="MAC Address to change into!")
+## Get User Input
+def get_user_input():
+    parse_object = optparse.OptionParser()
+    parse_object.add_option("-i","--interface",dest="wifi_interface",help="wifi interface to change!")
+    parse_object.add_option("-m", "--mac",dest="mac_address",help="MAC Address to change into!")
 
-(user_inputs, arguments) = parse_object.parse_args()
+    return parse_object.parse_args()
 
-user_interface = user_inputs.wifi_interface
-user_mac_address = user_inputs.mac_address
+## MAC Address Changer
+def mac_address_changer(user_interface, user_mac_address):
+    subprocess.call(["ifconfig", user_interface, "down"])
+    subprocess.call(["ifconfig",user_interface, "hw", "ether", user_mac_address])
+    subprocess.call(["ifconfig", user_interface, "up"])
 
-print("MacChanger Started !!")
+## Checking if MAC_Address has been changed
+def control_new_mac(user_interface):
+    ifconfig = subprocess.check_output(["ifconfig",user_interface])
+    print(ifconfig)
 
-subprocess.call(["ifconfig", user_interface, "down"])
-subprocess.call(["ifconfig",user_interface, "hw", "ether", user_mac_address])
-subprocess.call(["ifconfig", user_interface, "up"])
 
-print("MacChanger successfully Executed !!")
+print("MAC_Changer Started !!")
+## Calling get_user_input function and passing the tuples to mac_address_changer function
+(user_input,arguments) = get_user_input()
+mac_address_changer(user_input.wifi_interface,user_input.mac_address)
+control_new_mac(user_input.wifi_interface)
 
+
+print("MAC_Changer successfully Executed !!")
